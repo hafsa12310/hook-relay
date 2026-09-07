@@ -14,6 +14,7 @@ export class WebhooksController {
   @Post()
   @HttpCode(HttpStatus.OK)
   receiveWebhook(@Body() body: Record<string, unknown>) {
+    this.logger.log('Webhook received successfully: ' + JSON.stringify(body));
     
     return {
       received: true,

@@ -15,6 +15,7 @@ import { Body, Controller, HttpCode, HttpStatus, Logger, Post, } from '@nestjs/c
 let WebhooksController = WebhooksController_1 = class WebhooksController {
     logger = new Logger(WebhooksController_1.name);
     receiveWebhook(body) {
+        this.logger.log('Webhook received successfully: ' + JSON.stringify(body));
         return {
             received: true,
             receivedAt: new Date().toISOString(),

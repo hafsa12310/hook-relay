@@ -10,8 +10,11 @@ datasource db {
 
 enum DeliveryStatus {
   PENDING
+  PROCESSING
+  RETRY_SCHEDULED
   DELIVERED
   FAILED
+  DEAD
 }
 
 model Delivery {
@@ -22,6 +25,10 @@ model Delivery {
   status            DeliveryStatus @default(PENDING)
   destinationStatus Int?
   errorMessage      String?
+  attemptCount      Int            @default(0)
+  nextAttemptAt     DateTime?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+
+  @@index([status, nextAttemptAt])
 }

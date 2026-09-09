@@ -25,6 +25,8 @@ export const DeliveryScalarFieldEnum = {
     status: 'status',
     destinationStatus: 'destinationStatus',
     errorMessage: 'errorMessage',
+    attemptCount: 'attemptCount',
+    nextAttemptAt: 'nextAttemptAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

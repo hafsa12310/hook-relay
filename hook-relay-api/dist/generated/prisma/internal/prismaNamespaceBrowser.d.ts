@@ -29,6 +29,8 @@ export declare const DeliveryScalarFieldEnum: {
     readonly status: "status";
     readonly destinationStatus: "destinationStatus";
     readonly errorMessage: "errorMessage";
+    readonly attemptCount: "attemptCount";
+    readonly nextAttemptAt: "nextAttemptAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };

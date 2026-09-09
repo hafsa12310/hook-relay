@@ -6,4 +6,5 @@ export declare class DeliveryService {
     private readonly logger;
     constructor(httpService: HttpService, prisma: PrismaService);
     deliver(deliveryId: string): Promise<void>;
+    private parseRetryAfter;
 }

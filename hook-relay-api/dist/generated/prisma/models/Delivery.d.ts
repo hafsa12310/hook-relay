@@ -11,9 +11,11 @@ export type AggregateDelivery = {
 };
 export type DeliveryAvgAggregateOutputType = {
     destinationStatus: number | null;
+    attemptCount: number | null;
 };
 export type DeliverySumAggregateOutputType = {
     destinationStatus: number | null;
+    attemptCount: number | null;
 };
 export type DeliveryMinAggregateOutputType = {
     id: string | null;
@@ -22,6 +24,8 @@ export type DeliveryMinAggregateOutputType = {
     status: $Enums.DeliveryStatus | null;
     destinationStatus: number | null;
     errorMessage: string | null;
+    attemptCount: number | null;
+    nextAttemptAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -32,6 +36,8 @@ export type DeliveryMaxAggregateOutputType = {
     status: $Enums.DeliveryStatus | null;
     destinationStatus: number | null;
     errorMessage: string | null;
+    attemptCount: number | null;
+    nextAttemptAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -43,15 +49,19 @@ export type DeliveryCountAggregateOutputType = {
     status: number;
     destinationStatus: number;
     errorMessage: number;
+    attemptCount: number;
+    nextAttemptAt: number;
     createdAt: number;
     updatedAt: number;
     _all: number;
 };
 export type DeliveryAvgAggregateInputType = {
     destinationStatus?: true;
+    attemptCount?: true;
 };
 export type DeliverySumAggregateInputType = {
     destinationStatus?: true;
+    attemptCount?: true;
 };
 export type DeliveryMinAggregateInputType = {
     id?: true;
@@ -60,6 +70,8 @@ export type DeliveryMinAggregateInputType = {
     status?: true;
     destinationStatus?: true;
     errorMessage?: true;
+    attemptCount?: true;
+    nextAttemptAt?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -70,6 +82,8 @@ export type DeliveryMaxAggregateInputType = {
     status?: true;
     destinationStatus?: true;
     errorMessage?: true;
+    attemptCount?: true;
+    nextAttemptAt?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -81,6 +95,8 @@ export type DeliveryCountAggregateInputType = {
     status?: true;
     destinationStatus?: true;
     errorMessage?: true;
+    attemptCount?: true;
+    nextAttemptAt?: true;
     createdAt?: true;
     updatedAt?: true;
     _all?: true;
@@ -121,6 +137,8 @@ export type DeliveryGroupByOutputType = {
     status: $Enums.DeliveryStatus;
     destinationStatus: number | null;
     errorMessage: string | null;
+    attemptCount: number;
+    nextAttemptAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
     _count: DeliveryCountAggregateOutputType | null;
@@ -143,6 +161,8 @@ export type DeliveryWhereInput = {
     status?: Prisma.EnumDeliveryStatusFilter<"Delivery"> | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.IntNullableFilter<"Delivery"> | number | null;
     errorMessage?: Prisma.StringNullableFilter<"Delivery"> | string | null;
+    attemptCount?: Prisma.IntFilter<"Delivery"> | number;
+    nextAttemptAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
 };
@@ -154,6 +174,8 @@ export type DeliveryOrderByWithRelationInput = {
     status?: Prisma.SortOrder;
     destinationStatus?: Prisma.SortOrderInput | Prisma.SortOrder;
     errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
+    nextAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
@@ -168,6 +190,8 @@ export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
     status?: Prisma.EnumDeliveryStatusFilter<"Delivery"> | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.IntNullableFilter<"Delivery"> | number | null;
     errorMessage?: Prisma.StringNullableFilter<"Delivery"> | string | null;
+    attemptCount?: Prisma.IntFilter<"Delivery"> | number;
+    nextAttemptAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
 }, "id">;
@@ -179,6 +203,8 @@ export type DeliveryOrderByWithAggregationInput = {
     status?: Prisma.SortOrder;
     destinationStatus?: Prisma.SortOrderInput | Prisma.SortOrder;
     errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
+    nextAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     _count?: Prisma.DeliveryCountOrderByAggregateInput;
@@ -198,6 +224,8 @@ export type DeliveryScalarWhereWithAggregatesInput = {
     status?: Prisma.EnumDeliveryStatusWithAggregatesFilter<"Delivery"> | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.IntNullableWithAggregatesFilter<"Delivery"> | number | null;
     errorMessage?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null;
+    attemptCount?: Prisma.IntWithAggregatesFilter<"Delivery"> | number;
+    nextAttemptAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Delivery"> | Date | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Delivery"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Delivery"> | Date | string;
 };
@@ -209,6 +237,8 @@ export type DeliveryCreateInput = {
     status?: $Enums.DeliveryStatus;
     destinationStatus?: number | null;
     errorMessage?: string | null;
+    attemptCount?: number;
+    nextAttemptAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -220,6 +250,8 @@ export type DeliveryUncheckedCreateInput = {
     status?: $Enums.DeliveryStatus;
     destinationStatus?: number | null;
     errorMessage?: string | null;
+    attemptCount?: number;
+    nextAttemptAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -231,6 +263,8 @@ export type DeliveryUpdateInput = {
     status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
     errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    attemptCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -242,6 +276,8 @@ export type DeliveryUncheckedUpdateInput = {
     status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
     errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    attemptCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -253,6 +289,8 @@ export type DeliveryCreateManyInput = {
     status?: $Enums.DeliveryStatus;
     destinationStatus?: number | null;
     errorMessage?: string | null;
+    attemptCount?: number;
+    nextAttemptAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -264,6 +302,8 @@ export type DeliveryUpdateManyMutationInput = {
     status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
     errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    attemptCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -275,6 +315,8 @@ export type DeliveryUncheckedUpdateManyInput = {
     status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus;
     destinationStatus?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
     errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    attemptCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -286,11 +328,14 @@ export type DeliveryCountOrderByAggregateInput = {
     status?: Prisma.SortOrder;
     destinationStatus?: Prisma.SortOrder;
     errorMessage?: Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
+    nextAttemptAt?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
 export type DeliveryAvgOrderByAggregateInput = {
     destinationStatus?: Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
 };
 export type DeliveryMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -299,6 +344,8 @@ export type DeliveryMaxOrderByAggregateInput = {
     status?: Prisma.SortOrder;
     destinationStatus?: Prisma.SortOrder;
     errorMessage?: Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
+    nextAttemptAt?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
@@ -309,11 +356,14 @@ export type DeliveryMinOrderByAggregateInput = {
     status?: Prisma.SortOrder;
     destinationStatus?: Prisma.SortOrder;
     errorMessage?: Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
+    nextAttemptAt?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
 export type DeliverySumOrderByAggregateInput = {
     destinationStatus?: Prisma.SortOrder;
+    attemptCount?: Prisma.SortOrder;
 };
 export type StringFieldUpdateOperationsInput = {
     set?: string;
@@ -331,6 +381,16 @@ export type NullableIntFieldUpdateOperationsInput = {
 export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null;
 };
+export type IntFieldUpdateOperationsInput = {
+    set?: number;
+    increment?: number;
+    decrement?: number;
+    multiply?: number;
+    divide?: number;
+};
+export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null;
+};
 export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string;
 };
@@ -342,6 +402,8 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
     status?: boolean;
     destinationStatus?: boolean;
     errorMessage?: boolean;
+    attemptCount?: boolean;
+    nextAttemptAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 }, ExtArgs["result"]["delivery"]>;
@@ -353,6 +415,8 @@ export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
     status?: boolean;
     destinationStatus?: boolean;
     errorMessage?: boolean;
+    attemptCount?: boolean;
+    nextAttemptAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 }, ExtArgs["result"]["delivery"]>;
@@ -364,6 +428,8 @@ export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
     status?: boolean;
     destinationStatus?: boolean;
     errorMessage?: boolean;
+    attemptCount?: boolean;
+    nextAttemptAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 }, ExtArgs["result"]["delivery"]>;
@@ -375,10 +441,12 @@ export type DeliverySelectScalar = {
     status?: boolean;
     destinationStatus?: boolean;
     errorMessage?: boolean;
+    attemptCount?: boolean;
+    nextAttemptAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventType" | "payload" | "destinationUrl" | "status" | "destinationStatus" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>;
+export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventType" | "payload" | "destinationUrl" | "status" | "destinationStatus" | "errorMessage" | "attemptCount" | "nextAttemptAt" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery"]>;
 export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Delivery";
     objects: {};
@@ -390,6 +458,8 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
         status: $Enums.DeliveryStatus;
         destinationStatus: number | null;
         errorMessage: string | null;
+        attemptCount: number;
+        nextAttemptAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }, ExtArgs["result"]["delivery"]>;
@@ -456,6 +526,8 @@ export interface DeliveryFieldRefs {
     readonly status: Prisma.FieldRef<"Delivery", 'DeliveryStatus'>;
     readonly destinationStatus: Prisma.FieldRef<"Delivery", 'Int'>;
     readonly errorMessage: Prisma.FieldRef<"Delivery", 'String'>;
+    readonly attemptCount: Prisma.FieldRef<"Delivery", 'Int'>;
+    readonly nextAttemptAt: Prisma.FieldRef<"Delivery", 'DateTime'>;
     readonly createdAt: Prisma.FieldRef<"Delivery", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"Delivery", 'DateTime'>;
 }

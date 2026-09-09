@@ -18,6 +18,8 @@ export declare class WebhooksService {
         status: import("../generated/prisma/enums.js").DeliveryStatus;
         destinationStatus: number | null;
         errorMessage: string | null;
+        attemptCount: number;
+        nextAttemptAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;

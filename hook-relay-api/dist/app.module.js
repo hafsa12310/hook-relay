@@ -9,6 +9,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 let AppModule = class AppModule {
 };
@@ -21,6 +22,7 @@ AppModule = __decorate([
                 serviceId: 'hook-relay-api',
             }),
             WebhooksModule,
+            PrismaModule,
         ],
         controllers: [AppController],
         providers: [AppService],

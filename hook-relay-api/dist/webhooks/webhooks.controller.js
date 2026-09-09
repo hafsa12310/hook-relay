@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, HttpCode, HttpStatus, Post, } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service.js';
 let WebhooksController = class WebhooksController {
     webhooksService;
@@ -20,17 +20,27 @@ let WebhooksController = class WebhooksController {
     sendWebhook(body) {
         return this.webhooksService.sendWebhook(body);
     }
+    getDelivery(id) {
+        return this.webhooksService.getDelivery(id);
+    }
 };
 __decorate([
-    Post(),
-    HttpCode(HttpStatus.OK),
+    Post('send-webhook'),
+    HttpCode(HttpStatus.ACCEPTED),
     __param(0, Body()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], WebhooksController.prototype, "sendWebhook", null);
+__decorate([
+    Get('deliveries/:id'),
+    __param(0, Param('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WebhooksController.prototype, "getDelivery", null);
 WebhooksController = __decorate([
-    Controller('send-webhook'),
+    Controller(),
     __metadata("design:paramtypes", [WebhooksService])
 ], WebhooksController);
 export { WebhooksController };

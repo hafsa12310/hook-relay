@@ -3,8 +3,19 @@ export declare class WebhooksController {
     private readonly webhooksService;
     constructor(webhooksService: WebhooksService);
     sendWebhook(body: Record<string, unknown>): Promise<{
-        delivered: boolean;
-        destinationStatus: number;
-        receiverResponse: unknown;
+        accepted: boolean;
+        deliveryId: string;
+        message: string;
+    }>;
+    getDelivery(id: string): Promise<{
+        id: string;
+        eventType: string;
+        payload: import("@prisma/client/runtime/client").JsonValue;
+        destinationUrl: string;
+        status: import("../generated/prisma/enums.js").DeliveryStatus;
+        destinationStatus: number | null;
+        errorMessage: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
 }

@@ -1,11 +1,24 @@
-import { HttpService } from '@nestjs/axios';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { KafkaProducerService } from '../kafka/kafka-producer.service.js';
 export declare class WebhooksService {
-    private readonly httpService;
+    private readonly prisma;
+    private readonly kafkaProducer;
     private readonly logger;
-    constructor(httpService: HttpService);
+    constructor(prisma: PrismaService, kafkaProducer: KafkaProducerService);
     sendWebhook(body: Record<string, unknown>): Promise<{
-        delivered: boolean;
-        destinationStatus: number;
-        receiverResponse: unknown;
+        accepted: boolean;
+        deliveryId: string;
+        message: string;
+    }>;
+    getDelivery(id: string): Promise<{
+        id: string;
+        eventType: string;
+        payload: import("@prisma/client/runtime/client").JsonValue;
+        destinationUrl: string;
+        status: import("../generated/prisma/enums.js").DeliveryStatus;
+        destinationStatus: number | null;
+        errorMessage: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
 }

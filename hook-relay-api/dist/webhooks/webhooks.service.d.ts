@@ -20,5 +20,7 @@ export declare class WebhooksService {
         nextAttemptAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
+        processingToken: string | null;
+        processingExpiresAt: Date | null;
     }>;
 }

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { DELIVERY_TOPIC } from '../kafka/kafka.config.js';
+import { MAX_DELIVERY_ATTEMPTS } from './delivery-policy.js';
 
 @Injectable()
 export class RetrySchedulerService {
@@ -14,7 +15,7 @@ export class RetrySchedulerService {
     const dueDeliveries = await this.prisma.delivery.findMany({
       where: {
         status: 'RETRY_SCHEDULED',
-        attemptCount: { lt: 5 },
+        attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
         nextAttemptAt: { lte: new Date() },
       },
       orderBy: { nextAttemptAt: 'asc' },

@@ -12,6 +12,7 @@ import { DeliveryService } from './webhooks/delivery.service.js';
 import { RetrySchedulerService } from './webhooks/retry-scheduler.service.js';
 import { KafkaProducerService } from './kafka/kafka-producer.service.js';
 import { OutboxPublisherService } from './outbox/outbox-publisher.service.js';
+import { DeliveryRecoveryService } from './webhooks/delivery-recovery.service.js';
 let WorkerModule = class WorkerModule {
 };
 WorkerModule = __decorate([
@@ -26,6 +27,7 @@ WorkerModule = __decorate([
             RetrySchedulerService,
             KafkaProducerService,
             OutboxPublisherService,
+            DeliveryRecoveryService
         ],
     })
 ], WorkerModule);

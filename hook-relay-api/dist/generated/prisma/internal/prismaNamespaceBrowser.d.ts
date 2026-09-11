@@ -34,6 +34,8 @@ export declare const DeliveryScalarFieldEnum: {
     readonly nextAttemptAt: "nextAttemptAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
+    readonly processingToken: "processingToken";
+    readonly processingExpiresAt: "processingExpiresAt";
 };
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum];
 export declare const OutboxEventScalarFieldEnum: {

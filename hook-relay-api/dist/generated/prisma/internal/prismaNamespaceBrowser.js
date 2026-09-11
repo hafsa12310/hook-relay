@@ -9,7 +9,8 @@ export const DbNull = runtime.DbNull;
 export const JsonNull = runtime.JsonNull;
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
-    Delivery: 'Delivery'
+    Delivery: 'Delivery',
+    OutboxEvent: 'OutboxEvent'
 };
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -29,6 +30,17 @@ export const DeliveryScalarFieldEnum = {
     nextAttemptAt: 'nextAttemptAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+export const OutboxEventScalarFieldEnum = {
+    id: 'id',
+    deliveryId: 'deliveryId',
+    topic: 'topic',
+    payload: 'payload',
+    attemptCount: 'attemptCount',
+    nextAttemptAt: 'nextAttemptAt',
+    lastError: 'lastError',
+    publishedAt: 'publishedAt',
+    createdAt: 'createdAt'
 };
 export const SortOrder = {
     asc: 'asc',

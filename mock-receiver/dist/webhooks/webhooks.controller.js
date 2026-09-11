@@ -10,30 +10,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var WebhooksController_1;
-import { Body, Controller, HttpCode, HttpStatus, Logger, Post, } from '@nestjs/common';
-let WebhooksController = WebhooksController_1 = class WebhooksController {
-    logger = new Logger(WebhooksController_1.name);
-    receiveWebhook(body) {
-        this.logger.log('Webhook received successfully: ' + JSON.stringify(body));
-        return {
-            received: true,
-            receivedAt: new Date().toISOString(),
-            data: body,
-            message: 'Webhook received successfully!',
-        };
+import { BadRequestException, Body, Controller, Headers, HttpCode, HttpStatus, Post, } from '@nestjs/common';
+import { WebhookReceiverService } from './webhook-receiver.service.js';
+let WebhooksController = class WebhooksController {
+    receiverService;
+    constructor(receiverService) {
+        this.receiverService = receiverService;
+    }
+    receiveWebhook(deliveryId, body) {
+        if (typeof deliveryId !== 'string' ||
+            deliveryId.trim().length === 0 ||
+            deliveryId.length > 200) {
+            throw new BadRequestException('A valid X-HookRelay-Delivery-ID header is required');
+        }
+        if (!body ||
+            typeof body !== 'object' ||
+            Array.isArray(body) ||
+            typeof body.type !== 'string' ||
+            body.type.trim().length === 0) {
+            throw new BadRequestException('The webhook body must contain a non-empty type');
+        }
+        return this.receiverService.receive(deliveryId, body);
     }
 };
 __decorate([
     Post(),
     HttpCode(HttpStatus.OK),
-    __param(0, Body()),
+    __param(0, Headers('x-hookrelay-delivery-id')),
+    __param(1, Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], WebhooksController.prototype, "receiveWebhook", null);
-WebhooksController = WebhooksController_1 = __decorate([
-    Controller('webhooks')
+WebhooksController = __decorate([
+    Controller('webhooks'),
+    __metadata("design:paramtypes", [WebhookReceiverService])
 ], WebhooksController);
 export { WebhooksController };
 //# sourceMappingURL=webhooks.controller.js.map

@@ -6,17 +6,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { DeliveryService } from './webhooks/delivery.service.js';
 import { RetrySchedulerService } from './webhooks/retry-scheduler.service.js';
-import { ScheduleModule } from '@nestjs/schedule';
 import { KafkaProducerService } from './kafka/kafka-producer.service.js';
+import { OutboxPublisherService } from './outbox/outbox-publisher.service.js';
 let WorkerModule = class WorkerModule {
 };
 WorkerModule = __decorate([
     Module({
-        imports: [HttpModule, PrismaModule, ScheduleModule.forRoot(),],
-        providers: [DeliveryService, RetrySchedulerService, KafkaProducerService],
+        imports: [
+            HttpModule,
+            PrismaModule,
+            ScheduleModule.forRoot(),
+        ],
+        providers: [
+            DeliveryService,
+            RetrySchedulerService,
+            KafkaProducerService,
+            OutboxPublisherService,
+        ],
     })
 ], WorkerModule);
 export { WorkerModule };

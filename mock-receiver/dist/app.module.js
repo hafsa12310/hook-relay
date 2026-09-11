@@ -10,6 +10,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
 import { WebhooksController } from './webhooks/webhooks.controller.js';
+import { WebhookReceiverService } from './webhooks/webhook-receiver.service.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 let AppModule = class AppModule {
 };
@@ -24,7 +25,7 @@ AppModule = __decorate([
             WebhooksModule,
         ],
         controllers: [AppController, WebhooksController],
-        providers: [AppService],
+        providers: [AppService, WebhookReceiverService],
     })
 ], AppModule);
 export { AppModule };

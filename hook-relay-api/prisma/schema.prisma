@@ -32,3 +32,20 @@ model Delivery {
 
   @@index([status, nextAttemptAt])
 }
+
+model OutboxEvent {
+  id            String    @id @default(uuid())
+  deliveryId    String
+  topic         String
+  payload       Json
+
+  attemptCount  Int       @default(0)
+  nextAttemptAt DateTime  @default(now())
+  lastError     String?
+
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([publishedAt, nextAttemptAt])
+  @@index([deliveryId])
+}

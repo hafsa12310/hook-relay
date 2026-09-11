@@ -12,6 +12,7 @@ export declare const JsonNull: import("@prisma/client-runtime-utils").JsonNullCl
 export declare const AnyNull: import("@prisma/client-runtime-utils").AnyNullClass;
 export declare const ModelName: {
     readonly Delivery: "Delivery";
+    readonly OutboxEvent: "OutboxEvent";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -35,6 +36,18 @@ export declare const DeliveryScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum];
+export declare const OutboxEventScalarFieldEnum: {
+    readonly id: "id";
+    readonly deliveryId: "deliveryId";
+    readonly topic: "topic";
+    readonly payload: "payload";
+    readonly attemptCount: "attemptCount";
+    readonly nextAttemptAt: "nextAttemptAt";
+    readonly lastError: "lastError";
+    readonly publishedAt: "publishedAt";
+    readonly createdAt: "createdAt";
+};
+export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";

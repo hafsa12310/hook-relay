@@ -42,4 +42,27 @@ export class KafkaProducerService
   async onModuleDestroy() {
     await this.producer.disconnect();
   }
+
+  async publishOutboxEvent(
+  topic: string,
+  deliveryId: string,
+  payload: unknown,
+) {
+  const value = JSON.stringify(payload);
+
+  if (value === undefined) {
+    throw new Error('Outbox payload must be valid JSON');
+  }
+
+  await this.producer.send({
+    topic,
+    acks: -1,
+    messages: [
+      {
+        key: deliveryId,
+        value,
+      },
+    ],
+  });
+}
 }

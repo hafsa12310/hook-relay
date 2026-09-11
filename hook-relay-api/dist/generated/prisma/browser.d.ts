@@ -3,3 +3,4 @@ export { Prisma };
 export * as $Enums from './enums.js';
 export * from './enums.js';
 export type Delivery = Prisma.DeliveryModel;
+export type OutboxEvent = Prisma.OutboxEventModel;

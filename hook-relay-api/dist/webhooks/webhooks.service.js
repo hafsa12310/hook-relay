@@ -8,49 +8,50 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var WebhooksService_1;
-import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException, } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { KafkaProducerService } from '../kafka/kafka-producer.service.js';
+import { DELIVERY_TOPIC } from '../kafka/kafka.config.js';
 let WebhooksService = WebhooksService_1 = class WebhooksService {
     prisma;
-    kafkaProducer;
     logger = new Logger(WebhooksService_1.name);
-    constructor(prisma, kafkaProducer) {
+    constructor(prisma) {
         this.prisma = prisma;
-        this.kafkaProducer = kafkaProducer;
     }
     async sendWebhook(body) {
         if (!body ||
             typeof body !== 'object' ||
             Array.isArray(body) ||
             typeof body.type !== 'string' ||
-            body.type.trim() === '') {
-            throw new BadRequestException('The request must contain a non-empty type');
+            body.type.trim().length === 0) {
+            throw new BadRequestException('The webhook body must contain a non-empty type');
         }
-        const delivery = await this.prisma.delivery.create({
-            data: {
-                eventType: body.type,
-                payload: body,
-                destinationUrl: 'http://localhost:4000/webhooks',
-                status: 'PENDING',
-            },
-        });
-        try {
-            await this.kafkaProducer.publishDelivery(delivery.id);
-        }
-        catch (error) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Kafka publication failed: ${message}`);
-            throw new ServiceUnavailableException({
-                accepted: false,
-                deliveryId: delivery.id,
-                message: 'Delivery was saved, but Kafka publication was not confirmed',
+        const eventType = body.type;
+        const payload = body;
+        const delivery = await this.prisma.$transaction(async (tx) => {
+            const createdDelivery = await tx.delivery.create({
+                data: {
+                    eventType,
+                    payload,
+                    destinationUrl: 'http://localhost:4000/webhooks',
+                    status: 'PENDING',
+                },
             });
-        }
+            await tx.outboxEvent.create({
+                data: {
+                    deliveryId: createdDelivery.id,
+                    topic: DELIVERY_TOPIC,
+                    payload: {
+                        deliveryId: createdDelivery.id,
+                    },
+                },
+            });
+            return createdDelivery;
+        });
+        this.logger.log(`Delivery ${delivery.id} saved with an outbox event`);
         return {
             accepted: true,
             deliveryId: delivery.id,
-            message: 'Delivery accepted for background processing',
+            message: 'Delivery saved and queued for publishing',
         };
     }
     async getDelivery(id) {
@@ -65,8 +66,7 @@ let WebhooksService = WebhooksService_1 = class WebhooksService {
 };
 WebhooksService = WebhooksService_1 = __decorate([
     Injectable(),
-    __metadata("design:paramtypes", [PrismaService,
-        KafkaProducerService])
+    __metadata("design:paramtypes", [PrismaService])
 ], WebhooksService);
 export { WebhooksService };
 //# sourceMappingURL=webhooks.service.js.map

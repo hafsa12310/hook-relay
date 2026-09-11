@@ -11,19 +11,18 @@ var RetrySchedulerService_1;
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { KafkaProducerService } from '../kafka/kafka-producer.service.js';
+import { DELIVERY_TOPIC } from '../kafka/kafka.config.js';
 let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerService {
     prisma;
-    kafkaProducer;
     logger = new Logger(RetrySchedulerService_1.name);
-    constructor(prisma, kafkaProducer) {
+    constructor(prisma) {
         this.prisma = prisma;
-        this.kafkaProducer = kafkaProducer;
     }
     async publishDueRetries() {
         const dueDeliveries = await this.prisma.delivery.findMany({
             where: {
                 status: 'RETRY_SCHEDULED',
+                attemptCount: { lt: 5 },
                 nextAttemptAt: { lte: new Date() },
             },
             orderBy: { nextAttemptAt: 'asc' },
@@ -34,38 +33,41 @@ let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerServic
             },
         });
         for (const delivery of dueDeliveries) {
-            const claim = await this.prisma.delivery.updateMany({
-                where: {
-                    id: delivery.id,
-                    status: 'RETRY_SCHEDULED',
-                    attemptCount: delivery.attemptCount,
-                    nextAttemptAt: { lte: new Date() },
-                },
-                data: {
-                    status: 'PENDING',
-                    nextAttemptAt: null,
-                },
-            });
-            if (claim.count === 0)
-                continue;
             try {
-                await this.kafkaProducer.publishDelivery(delivery.id);
-                this.logger.log(`Published retry for delivery ${delivery.id}`);
+                const queued = await this.prisma.$transaction(async (tx) => {
+                    const claim = await tx.delivery.updateMany({
+                        where: {
+                            id: delivery.id,
+                            status: 'RETRY_SCHEDULED',
+                            attemptCount: delivery.attemptCount,
+                            nextAttemptAt: { lte: new Date() },
+                        },
+                        data: {
+                            status: 'PENDING',
+                            nextAttemptAt: null,
+                        },
+                    });
+                    if (claim.count === 0) {
+                        return false;
+                    }
+                    await tx.outboxEvent.create({
+                        data: {
+                            deliveryId: delivery.id,
+                            topic: DELIVERY_TOPIC,
+                            payload: {
+                                deliveryId: delivery.id,
+                            },
+                        },
+                    });
+                    return true;
+                });
+                if (queued) {
+                    this.logger.log(`Queued retry for delivery ${delivery.id} in outbox`);
+                }
             }
             catch (error) {
-                await this.prisma.delivery.updateMany({
-                    where: {
-                        id: delivery.id,
-                        status: 'PENDING',
-                        attemptCount: delivery.attemptCount,
-                    },
-                    data: {
-                        status: 'RETRY_SCHEDULED',
-                        nextAttemptAt: new Date(Date.now() + 5000),
-                    },
-                });
-                const message = error instanceof Error ? error.message : 'Unknown error';
-                this.logger.error(`Could not publish retry ${delivery.id}: ${message}`);
+                const message = error instanceof Error ? error.message : String(error);
+                this.logger.error(`Could not queue retry ${delivery.id}: ${message}`);
             }
         }
     }
@@ -78,8 +80,7 @@ __decorate([
 ], RetrySchedulerService.prototype, "publishDueRetries", null);
 RetrySchedulerService = RetrySchedulerService_1 = __decorate([
     Injectable(),
-    __metadata("design:paramtypes", [PrismaService,
-        KafkaProducerService])
+    __metadata("design:paramtypes", [PrismaService])
 ], RetrySchedulerService);
 export { RetrySchedulerService };
 //# sourceMappingURL=retry-scheduler.service.js.map

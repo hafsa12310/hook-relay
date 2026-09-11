@@ -6,11 +6,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { Module } from '@nestjs/common';
 import { WebhooksController } from './webhooks.controller.js';
+import { WebhookReceiverService } from './webhook-receiver.service.js';
 let WebhooksModule = class WebhooksModule {
 };
 WebhooksModule = __decorate([
     Module({
-        controllers: [WebhooksController]
+        controllers: [WebhooksController],
+        providers: [WebhookReceiverService],
     })
 ], WebhooksModule);
 export { WebhooksModule };

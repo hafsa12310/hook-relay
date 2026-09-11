@@ -161,6 +161,7 @@ export type FieldRef<Model, FieldType> = runtime.FieldRef<Model, FieldType>;
 type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRef<Model, FieldType>;
 export declare const ModelName: {
     readonly Delivery: "Delivery";
+    readonly OutboxEvent: "OutboxEvent";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -173,7 +174,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "delivery";
+        modelProps: "delivery" | "outboxEvent";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -251,6 +252,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        OutboxEvent: {
+            payload: Prisma.$OutboxEventPayload<ExtArgs>;
+            fields: Prisma.OutboxEventFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.OutboxEventFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.OutboxEventFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                findFirst: {
+                    args: Prisma.OutboxEventFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.OutboxEventFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                findMany: {
+                    args: Prisma.OutboxEventFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>[];
+                };
+                create: {
+                    args: Prisma.OutboxEventCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                createMany: {
+                    args: Prisma.OutboxEventCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.OutboxEventCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>[];
+                };
+                delete: {
+                    args: Prisma.OutboxEventDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                update: {
+                    args: Prisma.OutboxEventUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.OutboxEventDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.OutboxEventUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.OutboxEventUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>[];
+                };
+                upsert: {
+                    args: Prisma.OutboxEventUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxEventPayload>;
+                };
+                aggregate: {
+                    args: Prisma.OutboxEventAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateOutboxEvent>;
+                };
+                groupBy: {
+                    args: Prisma.OutboxEventGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.OutboxEventGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.OutboxEventCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.OutboxEventCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -296,6 +371,18 @@ export declare const DeliveryScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum];
+export declare const OutboxEventScalarFieldEnum: {
+    readonly id: "id";
+    readonly deliveryId: "deliveryId";
+    readonly topic: "topic";
+    readonly payload: "payload";
+    readonly attemptCount: "attemptCount";
+    readonly nextAttemptAt: "nextAttemptAt";
+    readonly lastError: "lastError";
+    readonly publishedAt: "publishedAt";
+    readonly createdAt: "createdAt";
+};
+export type OutboxEventScalarFieldEnum = (typeof OutboxEventScalarFieldEnum)[keyof typeof OutboxEventScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -362,6 +449,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter;
 export type GlobalOmitConfig = {
     delivery?: Prisma.DeliveryOmit;
+    outboxEvent?: Prisma.OutboxEventOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

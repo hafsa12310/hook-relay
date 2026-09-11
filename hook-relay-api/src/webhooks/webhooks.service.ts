@@ -3,20 +3,16 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  ServiceUnavailableException,
 } from '@nestjs/common';
+import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { KafkaProducerService } from '../kafka/kafka-producer.service.js';
-import { Prisma } from '../generated/prisma/client.js';
+import { DELIVERY_TOPIC } from '../kafka/kafka.config.js';
 
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
 
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly kafkaProducer: KafkaProducerService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async sendWebhook(body: Record<string, unknown>) {
     if (
@@ -24,44 +20,51 @@ export class WebhooksService {
       typeof body !== 'object' ||
       Array.isArray(body) ||
       typeof body.type !== 'string' ||
-      body.type.trim() === ''
+      body.type.trim().length === 0
     ) {
       throw new BadRequestException(
-        'The request must contain a non-empty type',
+        'The webhook body must contain a non-empty type',
       );
     }
 
-    const delivery = await this.prisma.delivery.create({
-      data: {
-        eventType: body.type,
-        payload: body as Prisma.InputJsonObject,
-        destinationUrl: 'http://localhost:4000/webhooks',
-        status: 'PENDING',
-      },
+    const eventType = body.type;
+
+    // Nest has already parsed the HTTP JSON body.
+    const payload = body as Prisma.InputJsonObject;
+
+    const delivery = await this.prisma.$transaction(async (tx) => {
+      // First: save the webhook delivery.
+      const createdDelivery = await tx.delivery.create({
+        data: {
+          eventType,
+          payload,
+          destinationUrl: 'http://localhost:4000/webhooks',
+          status: 'PENDING',
+        },
+      });
+
+      // Second: save the instruction to publish its ID.
+      await tx.outboxEvent.create({
+        data: {
+          deliveryId: createdDelivery.id,
+          topic: DELIVERY_TOPIC,
+          payload: {
+            deliveryId: createdDelivery.id,
+          },
+        },
+      });
+
+      return createdDelivery;
     });
 
-    // 3. Publish the delivery ID to Kafka.
-    try {
-      await this.kafkaProducer.publishDelivery(delivery.id);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Unknown error';
+    this.logger.log(
+      `Delivery ${delivery.id} saved with an outbox event`,
+    );
 
-      this.logger.error(`Kafka publication failed: ${message}`);
-
-      throw new ServiceUnavailableException({
-        accepted: false,
-        deliveryId: delivery.id,
-        message:
-          'Delivery was saved, but Kafka publication was not confirmed',
-      });
-    }
-
-    // 4. Confirm acceptance to the caller.
     return {
       accepted: true,
       deliveryId: delivery.id,
-      message: 'Delivery accepted for background processing',
+      message: 'Delivery saved and queued for publishing',
     };
   }
 

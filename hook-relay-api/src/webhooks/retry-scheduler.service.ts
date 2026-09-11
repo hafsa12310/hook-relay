@@ -1,22 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { KafkaProducerService } from '../kafka/kafka-producer.service.js';
+import { DELIVERY_TOPIC } from '../kafka/kafka.config.js';
 
 @Injectable()
 export class RetrySchedulerService {
   private readonly logger = new Logger(RetrySchedulerService.name);
 
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly kafkaProducer: KafkaProducerService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   @Cron('*/5 * * * * *', { waitForCompletion: true })
   async publishDueRetries() {
     const dueDeliveries = await this.prisma.delivery.findMany({
       where: {
         status: 'RETRY_SCHEDULED',
+        attemptCount: { lt: 5 },
         nextAttemptAt: { lte: new Date() },
       },
       orderBy: { nextAttemptAt: 'asc' },
@@ -28,48 +26,51 @@ export class RetrySchedulerService {
     });
 
     for (const delivery of dueDeliveries) {
-      // Claim this retry for publication.
-      const claim = await this.prisma.delivery.updateMany({
-        where: {
-          id: delivery.id,
-          status: 'RETRY_SCHEDULED',
-          attemptCount: delivery.attemptCount,
-          nextAttemptAt: { lte: new Date() },
-        },
-        data: {
-          status: 'PENDING',
-          nextAttemptAt: null,
-        },
-      });
-
-      if (claim.count === 0) continue;
-
       try {
-        await this.kafkaProducer.publishDelivery(delivery.id);
+        const queued = await this.prisma.$transaction(async (tx) => {
+          // Claim this due retry.
+          const claim = await tx.delivery.updateMany({
+            where: {
+              id: delivery.id,
+              status: 'RETRY_SCHEDULED',
+              attemptCount: delivery.attemptCount,
+              nextAttemptAt: { lte: new Date() },
+            },
+            data: {
+              status: 'PENDING',
+              nextAttemptAt: null,
+            },
+          });
 
-        this.logger.log(
-          `Published retry for delivery ${delivery.id}`,
-        );
-      } catch (error: unknown) {
-        // If publication fails, make it eligible again later.
-        // Do not overwrite a delivery already taken by a worker.
-        await this.prisma.delivery.updateMany({
-          where: {
-            id: delivery.id,
-            status: 'PENDING',
-            attemptCount: delivery.attemptCount,
-          },
-          data: {
-            status: 'RETRY_SCHEDULED',
-            nextAttemptAt: new Date(Date.now() + 5000),
-          },
+          if (claim.count === 0) {
+            return false;
+          }
+
+          // Save the publishing instruction in the same transaction.
+          await tx.outboxEvent.create({
+            data: {
+              deliveryId: delivery.id,
+              topic: DELIVERY_TOPIC,
+              payload: {
+                deliveryId: delivery.id,
+              },
+            },
+          });
+
+          return true;
         });
 
+        if (queued) {
+          this.logger.log(
+            `Queued retry for delivery ${delivery.id} in outbox`,
+          );
+        }
+      } catch (error: unknown) {
         const message =
-          error instanceof Error ? error.message : 'Unknown error';
+          error instanceof Error ? error.message : String(error);
 
         this.logger.error(
-          `Could not publish retry ${delivery.id}: ${message}`,
+          `Could not queue retry ${delivery.id}: ${message}`,
         );
       }
     }

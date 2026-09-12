@@ -38,7 +38,7 @@ export class WebhooksService {
         data: {
           eventType,
           payload,
-          destinationUrl: 'http://localhost:4000/webhooks',
+          destinationUrl: process.env.WEBHOOK_DESTINATION_URL ?? 'http://localhost:4000/webhooks',
           status: 'PENDING',
         },
       });

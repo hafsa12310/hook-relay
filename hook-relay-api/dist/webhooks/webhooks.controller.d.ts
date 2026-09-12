@@ -21,5 +21,6 @@ export declare class WebhooksController {
         updatedAt: Date;
         processingToken: string | null;
         processingExpiresAt: Date | null;
+        waitReason: string | null;
     }>;
 }

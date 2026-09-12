@@ -8,6 +8,10 @@ import type {
   Delivery,
   Prisma,
 } from '../generated/prisma/client.js';
+import {
+  RedisRateLimiterService,
+  type RateLimitDecision,
+} from '../redis/redis-rate-limiter.service.js';
 
 import {
   DELIVERY_TIMEOUT_MS,
@@ -23,28 +27,79 @@ export class DeliveryService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly rateLimiter: RedisRateLimiterService,  
   ) {}
 
   async deliver(deliveryId: string) {
-    const processingToken = randomUUID();
+    const candidate = await this.prisma.delivery.findFirst({
+    where: {
+      id: deliveryId,
+      status: 'PENDING',
+      attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
+    },
+    select: {
+      id: true,
+      destinationUrl: true,
+      attemptCount: true,
+    },
+  });
 
-    // Only one worker can change this PENDING delivery to PROCESSING.
-    const claim = await this.prisma.delivery.updateMany({
-      where: {
-        id: deliveryId,
-        status: 'PENDING',
-        attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
-      },
-      data: {
-        status: 'PROCESSING',
-        attemptCount: { increment: 1 },
-        nextAttemptAt: null,
-        processingToken,
-        processingExpiresAt: new Date(
-          Date.now() + PROCESSING_LEASE_MS,
-        ),
-      },
-    });
+  if (!candidate) {
+    return;
+  }
+
+  let decision: RateLimitDecision;
+
+  try {
+    decision = await this.rateLimiter.tryAcquire(
+      candidate.destinationUrl,
+    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : String(error);
+
+    this.logger.warn(`Rate-limit check failed: ${message}`);
+
+    await this.deferDelivery(
+      candidate.id,
+      candidate.attemptCount,
+      5000,
+      'REDIS_UNAVAILABLE',
+    );
+
+    return;
+  }
+
+  if (!decision.allowed) {
+    await this.deferDelivery(
+      candidate.id,
+      candidate.attemptCount,
+      decision.retryAfterMs + 50,
+      'RATE_LIMIT',
+    );
+
+    return;
+  }
+
+  const processingToken = randomUUID();
+
+  const claim = await this.prisma.delivery.updateMany({
+    where: {
+      id: deliveryId,
+      status: 'PENDING',
+      attemptCount: candidate.attemptCount,
+    },
+    data: {
+      status: 'PROCESSING',
+      attemptCount: { increment: 1 },
+      nextAttemptAt: null,
+      waitReason: null,
+      processingToken,
+      processingExpiresAt: new Date(
+        Date.now() + PROCESSING_LEASE_MS,
+      ),
+    },
+  });
 
     if (claim.count === 0) {
       return;
@@ -246,4 +301,36 @@ export class DeliveryService {
       process.exit(1);
     }
   }
+
+  private async deferDelivery(
+  deliveryId: string,
+  expectedAttemptCount: number,
+  delayMs: number,
+  reason: string,
+): Promise<void> {
+  const jitterMs = Math.floor(Math.random() * 100);
+
+  const result = await this.prisma.delivery.updateMany({
+    where: {
+      id: deliveryId,
+      status: 'PENDING',
+      attemptCount: expectedAttemptCount,
+    },
+    data: {
+      status: 'WAITING',
+      waitReason: reason,
+      nextAttemptAt: new Date(
+        Date.now() + Math.max(100, Math.ceil(delayMs)) + jitterMs,
+      ),
+    },
+  });
+
+  if (result.count > 0) {
+    this.logger.log(
+      `Deferred ${deliveryId}: ${reason}; ` +
+        `attempt count remains ${expectedAttemptCount}`,
+    );
+  }
+}
+
 }

@@ -30,6 +30,7 @@ export type DeliveryMinAggregateOutputType = {
     updatedAt: Date | null;
     processingToken: string | null;
     processingExpiresAt: Date | null;
+    waitReason: string | null;
 };
 export type DeliveryMaxAggregateOutputType = {
     id: string | null;
@@ -44,6 +45,7 @@ export type DeliveryMaxAggregateOutputType = {
     updatedAt: Date | null;
     processingToken: string | null;
     processingExpiresAt: Date | null;
+    waitReason: string | null;
 };
 export type DeliveryCountAggregateOutputType = {
     id: number;
@@ -59,6 +61,7 @@ export type DeliveryCountAggregateOutputType = {
     updatedAt: number;
     processingToken: number;
     processingExpiresAt: number;
+    waitReason: number;
     _all: number;
 };
 export type DeliveryAvgAggregateInputType = {
@@ -82,6 +85,7 @@ export type DeliveryMinAggregateInputType = {
     updatedAt?: true;
     processingToken?: true;
     processingExpiresAt?: true;
+    waitReason?: true;
 };
 export type DeliveryMaxAggregateInputType = {
     id?: true;
@@ -96,6 +100,7 @@ export type DeliveryMaxAggregateInputType = {
     updatedAt?: true;
     processingToken?: true;
     processingExpiresAt?: true;
+    waitReason?: true;
 };
 export type DeliveryCountAggregateInputType = {
     id?: true;
@@ -111,6 +116,7 @@ export type DeliveryCountAggregateInputType = {
     updatedAt?: true;
     processingToken?: true;
     processingExpiresAt?: true;
+    waitReason?: true;
     _all?: true;
 };
 export type DeliveryAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -155,6 +161,7 @@ export type DeliveryGroupByOutputType = {
     updatedAt: Date;
     processingToken: string | null;
     processingExpiresAt: Date | null;
+    waitReason: string | null;
     _count: DeliveryCountAggregateOutputType | null;
     _avg: DeliveryAvgAggregateOutputType | null;
     _sum: DeliverySumAggregateOutputType | null;
@@ -181,6 +188,7 @@ export type DeliveryWhereInput = {
     updatedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
     processingToken?: Prisma.StringNullableFilter<"Delivery"> | string | null;
     processingExpiresAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null;
+    waitReason?: Prisma.StringNullableFilter<"Delivery"> | string | null;
 };
 export type DeliveryOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -196,6 +204,7 @@ export type DeliveryOrderByWithRelationInput = {
     updatedAt?: Prisma.SortOrder;
     processingToken?: Prisma.SortOrderInput | Prisma.SortOrder;
     processingExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    waitReason?: Prisma.SortOrderInput | Prisma.SortOrder;
 };
 export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -214,6 +223,7 @@ export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
     updatedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string;
     processingToken?: Prisma.StringNullableFilter<"Delivery"> | string | null;
     processingExpiresAt?: Prisma.DateTimeNullableFilter<"Delivery"> | Date | string | null;
+    waitReason?: Prisma.StringNullableFilter<"Delivery"> | string | null;
 }, "id">;
 export type DeliveryOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -229,6 +239,7 @@ export type DeliveryOrderByWithAggregationInput = {
     updatedAt?: Prisma.SortOrder;
     processingToken?: Prisma.SortOrderInput | Prisma.SortOrder;
     processingExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    waitReason?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.DeliveryCountOrderByAggregateInput;
     _avg?: Prisma.DeliveryAvgOrderByAggregateInput;
     _max?: Prisma.DeliveryMaxOrderByAggregateInput;
@@ -252,6 +263,7 @@ export type DeliveryScalarWhereWithAggregatesInput = {
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Delivery"> | Date | string;
     processingToken?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null;
     processingExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Delivery"> | Date | string | null;
+    waitReason?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null;
 };
 export type DeliveryCreateInput = {
     id?: string;
@@ -267,6 +279,7 @@ export type DeliveryCreateInput = {
     updatedAt?: Date | string;
     processingToken?: string | null;
     processingExpiresAt?: Date | string | null;
+    waitReason?: string | null;
 };
 export type DeliveryUncheckedCreateInput = {
     id?: string;
@@ -282,6 +295,7 @@ export type DeliveryUncheckedCreateInput = {
     updatedAt?: Date | string;
     processingToken?: string | null;
     processingExpiresAt?: Date | string | null;
+    waitReason?: string | null;
 };
 export type DeliveryUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -297,6 +311,7 @@ export type DeliveryUpdateInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     processingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     processingExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    waitReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type DeliveryUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -312,6 +327,7 @@ export type DeliveryUncheckedUpdateInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     processingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     processingExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    waitReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type DeliveryCreateManyInput = {
     id?: string;
@@ -327,6 +343,7 @@ export type DeliveryCreateManyInput = {
     updatedAt?: Date | string;
     processingToken?: string | null;
     processingExpiresAt?: Date | string | null;
+    waitReason?: string | null;
 };
 export type DeliveryUpdateManyMutationInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -342,6 +359,7 @@ export type DeliveryUpdateManyMutationInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     processingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     processingExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    waitReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type DeliveryUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -357,6 +375,7 @@ export type DeliveryUncheckedUpdateManyInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     processingToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     processingExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    waitReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type DeliveryCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -372,6 +391,7 @@ export type DeliveryCountOrderByAggregateInput = {
     updatedAt?: Prisma.SortOrder;
     processingToken?: Prisma.SortOrder;
     processingExpiresAt?: Prisma.SortOrder;
+    waitReason?: Prisma.SortOrder;
 };
 export type DeliveryAvgOrderByAggregateInput = {
     destinationStatus?: Prisma.SortOrder;
@@ -390,6 +410,7 @@ export type DeliveryMaxOrderByAggregateInput = {
     updatedAt?: Prisma.SortOrder;
     processingToken?: Prisma.SortOrder;
     processingExpiresAt?: Prisma.SortOrder;
+    waitReason?: Prisma.SortOrder;
 };
 export type DeliveryMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -404,6 +425,7 @@ export type DeliveryMinOrderByAggregateInput = {
     updatedAt?: Prisma.SortOrder;
     processingToken?: Prisma.SortOrder;
     processingExpiresAt?: Prisma.SortOrder;
+    waitReason?: Prisma.SortOrder;
 };
 export type DeliverySumOrderByAggregateInput = {
     destinationStatus?: Prisma.SortOrder;
@@ -452,6 +474,7 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
     updatedAt?: boolean;
     processingToken?: boolean;
     processingExpiresAt?: boolean;
+    waitReason?: boolean;
 }, ExtArgs["result"]["delivery"]>;
 export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -467,6 +490,7 @@ export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
     updatedAt?: boolean;
     processingToken?: boolean;
     processingExpiresAt?: boolean;
+    waitReason?: boolean;
 }, ExtArgs["result"]["delivery"]>;
 export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -482,6 +506,7 @@ export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
     updatedAt?: boolean;
     processingToken?: boolean;
     processingExpiresAt?: boolean;
+    waitReason?: boolean;
 }, ExtArgs["result"]["delivery"]>;
 export type DeliverySelectScalar = {
     id?: boolean;
@@ -497,8 +522,9 @@ export type DeliverySelectScalar = {
     updatedAt?: boolean;
     processingToken?: boolean;
     processingExpiresAt?: boolean;
+    waitReason?: boolean;
 };
-export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventType" | "payload" | "destinationUrl" | "status" | "destinationStatus" | "errorMessage" | "attemptCount" | "nextAttemptAt" | "createdAt" | "updatedAt" | "processingToken" | "processingExpiresAt", ExtArgs["result"]["delivery"]>;
+export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventType" | "payload" | "destinationUrl" | "status" | "destinationStatus" | "errorMessage" | "attemptCount" | "nextAttemptAt" | "createdAt" | "updatedAt" | "processingToken" | "processingExpiresAt" | "waitReason", ExtArgs["result"]["delivery"]>;
 export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Delivery";
     objects: {};
@@ -516,6 +542,7 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
         updatedAt: Date;
         processingToken: string | null;
         processingExpiresAt: Date | null;
+        waitReason: string | null;
     }, ExtArgs["result"]["delivery"]>;
     composites: {};
 };
@@ -586,6 +613,7 @@ export interface DeliveryFieldRefs {
     readonly updatedAt: Prisma.FieldRef<"Delivery", 'DateTime'>;
     readonly processingToken: Prisma.FieldRef<"Delivery", 'String'>;
     readonly processingExpiresAt: Prisma.FieldRef<"Delivery", 'DateTime'>;
+    readonly waitReason: Prisma.FieldRef<"Delivery", 'String'>;
 }
 export type DeliveryFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.DeliverySelect<ExtArgs> | null;

@@ -13,27 +13,60 @@ import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
 import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { RedisRateLimiterService, } from '../redis/redis-rate-limiter.service.js';
 import { DELIVERY_TIMEOUT_MS, MAX_DELIVERY_ATTEMPTS, PROCESSING_LEASE_MS, RETRY_DELAYS_MS, } from './delivery-policy.js';
 let DeliveryService = DeliveryService_1 = class DeliveryService {
     prisma;
     httpService;
+    rateLimiter;
     logger = new Logger(DeliveryService_1.name);
-    constructor(prisma, httpService) {
+    constructor(prisma, httpService, rateLimiter) {
         this.prisma = prisma;
         this.httpService = httpService;
+        this.rateLimiter = rateLimiter;
     }
     async deliver(deliveryId) {
-        const processingToken = randomUUID();
-        const claim = await this.prisma.delivery.updateMany({
+        const candidate = await this.prisma.delivery.findFirst({
             where: {
                 id: deliveryId,
                 status: 'PENDING',
                 attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
             },
+            select: {
+                id: true,
+                destinationUrl: true,
+                attemptCount: true,
+            },
+        });
+        if (!candidate) {
+            return;
+        }
+        let decision;
+        try {
+            decision = await this.rateLimiter.tryAcquire(candidate.destinationUrl);
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.warn(`Rate-limit check failed: ${message}`);
+            await this.deferDelivery(candidate.id, candidate.attemptCount, 5000, 'REDIS_UNAVAILABLE');
+            return;
+        }
+        if (!decision.allowed) {
+            await this.deferDelivery(candidate.id, candidate.attemptCount, decision.retryAfterMs + 50, 'RATE_LIMIT');
+            return;
+        }
+        const processingToken = randomUUID();
+        const claim = await this.prisma.delivery.updateMany({
+            where: {
+                id: deliveryId,
+                status: 'PENDING',
+                attemptCount: candidate.attemptCount,
+            },
             data: {
                 status: 'PROCESSING',
                 attemptCount: { increment: 1 },
                 nextAttemptAt: null,
+                waitReason: null,
                 processingToken,
                 processingExpiresAt: new Date(Date.now() + PROCESSING_LEASE_MS),
             },
@@ -162,11 +195,31 @@ let DeliveryService = DeliveryService_1 = class DeliveryService {
             process.exit(1);
         }
     }
+    async deferDelivery(deliveryId, expectedAttemptCount, delayMs, reason) {
+        const jitterMs = Math.floor(Math.random() * 100);
+        const result = await this.prisma.delivery.updateMany({
+            where: {
+                id: deliveryId,
+                status: 'PENDING',
+                attemptCount: expectedAttemptCount,
+            },
+            data: {
+                status: 'WAITING',
+                waitReason: reason,
+                nextAttemptAt: new Date(Date.now() + Math.max(100, Math.ceil(delayMs)) + jitterMs),
+            },
+        });
+        if (result.count > 0) {
+            this.logger.log(`Deferred ${deliveryId}: ${reason}; ` +
+                `attempt count remains ${expectedAttemptCount}`);
+        }
+    }
 };
 DeliveryService = DeliveryService_1 = __decorate([
     Injectable(),
     __metadata("design:paramtypes", [PrismaService,
-        HttpService])
+        HttpService,
+        RedisRateLimiterService])
 ], DeliveryService);
 export { DeliveryService };
 //# sourceMappingURL=delivery.service.js.map

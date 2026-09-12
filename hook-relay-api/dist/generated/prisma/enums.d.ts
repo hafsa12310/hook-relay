@@ -5,5 +5,6 @@ export declare const DeliveryStatus: {
     readonly DELIVERED: "DELIVERED";
     readonly FAILED: "FAILED";
     readonly DEAD: "DEAD";
+    readonly WAITING: "WAITING";
 };
 export type DeliveryStatus = (typeof DeliveryStatus)[keyof typeof DeliveryStatus];

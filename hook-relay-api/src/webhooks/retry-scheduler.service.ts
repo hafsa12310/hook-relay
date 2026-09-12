@@ -10,11 +10,13 @@ export class RetrySchedulerService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron('*/5 * * * * *', { waitForCompletion: true })
+  @Cron('* * * * * *', { waitForCompletion: true })
   async publishDueRetries() {
     const dueDeliveries = await this.prisma.delivery.findMany({
       where: {
-        status: 'RETRY_SCHEDULED',
+        status: {
+          in: ['RETRY_SCHEDULED', 'WAITING'],
+        },
         attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
         nextAttemptAt: { lte: new Date() },
       },
@@ -22,6 +24,7 @@ export class RetrySchedulerService {
       take: 100,
       select: {
         id: true,
+        status: true,
         attemptCount: true,
       },
     });
@@ -29,17 +32,17 @@ export class RetrySchedulerService {
     for (const delivery of dueDeliveries) {
       try {
         const queued = await this.prisma.$transaction(async (tx) => {
-          // Claim this due retry.
           const claim = await tx.delivery.updateMany({
             where: {
               id: delivery.id,
-              status: 'RETRY_SCHEDULED',
+              status: delivery.status,
               attemptCount: delivery.attemptCount,
               nextAttemptAt: { lte: new Date() },
             },
             data: {
               status: 'PENDING',
               nextAttemptAt: null,
+              waitReason: null,
             },
           });
 
@@ -47,7 +50,6 @@ export class RetrySchedulerService {
             return false;
           }
 
-          // Save the publishing instruction in the same transaction.
           await tx.outboxEvent.create({
             data: {
               deliveryId: delivery.id,
@@ -63,7 +65,7 @@ export class RetrySchedulerService {
 
         if (queued) {
           this.logger.log(
-            `Queued retry for delivery ${delivery.id} in outbox`,
+            `Queued due delivery ${delivery.id} in outbox`,
           );
         }
       } catch (error: unknown) {
@@ -71,7 +73,7 @@ export class RetrySchedulerService {
           error instanceof Error ? error.message : String(error);
 
         this.logger.error(
-          `Could not queue retry ${delivery.id}: ${message}`,
+          `Could not queue delivery ${delivery.id}: ${message}`,
         );
       }
     }

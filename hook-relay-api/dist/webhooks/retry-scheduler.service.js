@@ -22,7 +22,9 @@ let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerServic
     async publishDueRetries() {
         const dueDeliveries = await this.prisma.delivery.findMany({
             where: {
-                status: 'RETRY_SCHEDULED',
+                status: {
+                    in: ['RETRY_SCHEDULED', 'WAITING'],
+                },
                 attemptCount: { lt: MAX_DELIVERY_ATTEMPTS },
                 nextAttemptAt: { lte: new Date() },
             },
@@ -30,6 +32,7 @@ let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerServic
             take: 100,
             select: {
                 id: true,
+                status: true,
                 attemptCount: true,
             },
         });
@@ -39,13 +42,14 @@ let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerServic
                     const claim = await tx.delivery.updateMany({
                         where: {
                             id: delivery.id,
-                            status: 'RETRY_SCHEDULED',
+                            status: delivery.status,
                             attemptCount: delivery.attemptCount,
                             nextAttemptAt: { lte: new Date() },
                         },
                         data: {
                             status: 'PENDING',
                             nextAttemptAt: null,
+                            waitReason: null,
                         },
                     });
                     if (claim.count === 0) {
@@ -63,18 +67,18 @@ let RetrySchedulerService = RetrySchedulerService_1 = class RetrySchedulerServic
                     return true;
                 });
                 if (queued) {
-                    this.logger.log(`Queued retry for delivery ${delivery.id} in outbox`);
+                    this.logger.log(`Queued due delivery ${delivery.id} in outbox`);
                 }
             }
             catch (error) {
                 const message = error instanceof Error ? error.message : String(error);
-                this.logger.error(`Could not queue retry ${delivery.id}: ${message}`);
+                this.logger.error(`Could not queue delivery ${delivery.id}: ${message}`);
             }
         }
     }
 };
 __decorate([
-    Cron('*/5 * * * * *', { waitForCompletion: true }),
+    Cron('* * * * * *', { waitForCompletion: true }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

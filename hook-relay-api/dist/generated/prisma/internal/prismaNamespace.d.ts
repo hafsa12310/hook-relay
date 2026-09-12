@@ -371,6 +371,7 @@ export declare const DeliveryScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
     readonly processingToken: "processingToken";
     readonly processingExpiresAt: "processingExpiresAt";
+    readonly waitReason: "waitReason";
 };
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum];
 export declare const OutboxEventScalarFieldEnum: {

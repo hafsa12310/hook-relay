@@ -46,7 +46,8 @@ export const DeliveryScalarFieldEnum = {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     processingToken: 'processingToken',
-    processingExpiresAt: 'processingExpiresAt'
+    processingExpiresAt: 'processingExpiresAt',
+    waitReason: 'waitReason'
 };
 export const OutboxEventScalarFieldEnum = {
     id: 'id',

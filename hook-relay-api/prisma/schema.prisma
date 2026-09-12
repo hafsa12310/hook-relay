@@ -15,6 +15,7 @@ enum DeliveryStatus {
   DELIVERED
   FAILED
   DEAD
+  WAITING
 }
 
 model Delivery {
@@ -31,6 +32,7 @@ model Delivery {
   updatedAt         DateTime       @updatedAt
   processingToken     String?
   processingExpiresAt DateTime?
+  waitReason String?
 
   @@index([status, nextAttemptAt])
   @@index([status, processingExpiresAt])

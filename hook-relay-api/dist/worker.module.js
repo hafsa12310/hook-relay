@@ -13,6 +13,7 @@ import { RetrySchedulerService } from './webhooks/retry-scheduler.service.js';
 import { KafkaProducerService } from './kafka/kafka-producer.service.js';
 import { OutboxPublisherService } from './outbox/outbox-publisher.service.js';
 import { DeliveryRecoveryService } from './webhooks/delivery-recovery.service.js';
+import { RedisModule } from './redis/redis.module.js';
 let WorkerModule = class WorkerModule {
 };
 WorkerModule = __decorate([
@@ -21,13 +22,14 @@ WorkerModule = __decorate([
             HttpModule,
             PrismaModule,
             ScheduleModule.forRoot(),
+            RedisModule,
         ],
         providers: [
             DeliveryService,
             RetrySchedulerService,
             KafkaProducerService,
             OutboxPublisherService,
-            DeliveryRecoveryService
+            DeliveryRecoveryService,
         ],
     })
 ], WorkerModule);

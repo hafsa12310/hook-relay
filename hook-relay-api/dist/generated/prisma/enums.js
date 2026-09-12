@@ -4,6 +4,7 @@ export const DeliveryStatus = {
     RETRY_SCHEDULED: 'RETRY_SCHEDULED',
     DELIVERED: 'DELIVERED',
     FAILED: 'FAILED',
-    DEAD: 'DEAD'
+    DEAD: 'DEAD',
+    WAITING: 'WAITING'
 };
 //# sourceMappingURL=enums.js.map

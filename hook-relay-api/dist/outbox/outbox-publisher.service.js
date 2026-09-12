@@ -88,7 +88,7 @@ let OutboxPublisherService = OutboxPublisherService_1 = class OutboxPublisherSer
     }
 };
 __decorate([
-    Cron('*/2 * * * * *', { waitForCompletion: true }),
+    Cron('* * * * * *', { waitForCompletion: true }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

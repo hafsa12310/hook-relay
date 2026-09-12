@@ -18,7 +18,7 @@ export class OutboxPublisherService {
     private readonly kafkaProducer: KafkaProducerService,
   ) {}
 
-  @Cron('*/2 * * * * *', { waitForCompletion: true })
+  @Cron('* * * * * *', { waitForCompletion: true })
   async publishPendingEvents() {
     const events = await this.prisma.outboxEvent.findMany({
       where: {
